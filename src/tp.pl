@@ -52,4 +52,24 @@ estaViva(Persona, AnioDado):-
 
 :- begin_tests(tpIntegrador, []).
 
+
+test("kanne esta viva en 1370") :-
+    estaViva(kanne, 1370).
+
+test("kanne no esta viva en 1300") :-
+    not(estaViva(kanne, 1300)).
+
+test("kanne no esta viva en 2000") :-
+    not(estaViva(kanne, 2000)).
+
+test("voll esta vivo en 1550") :-
+    estaViva(voll, 1550).
+
+test("voll ya no esta vivo en 1551") :-
+    not(estaViva(voll, 1551)).
+
+test("serie esta viva en 5000") :-
+    estaViva(serie, 5000).
+
+
 :- end_tests(tpIntegrador).
