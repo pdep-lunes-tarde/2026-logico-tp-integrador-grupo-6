@@ -1,3 +1,6 @@
+
+% Parte 1
+
 % habitante(Nombre, Raza, AnioNacimiento, Pueblo).
 
 habitante(denken, humano, 1290, auberst).
@@ -11,7 +14,6 @@ habitante(wirbel, humano, 1350, klares).
 habitante(lernen, humano, 1315, auberst).
 habitante(frieren, elfo, 100, weise).
 habitante(eisen, enano, 1150, riegel).
-
 
 
 estaViva(Persona, AnioDado):-
@@ -32,13 +34,48 @@ estaViva(Persona, AnioDado):-
 
 
 
+% Parte 2
+
+% conoce(Quien, Hazania, DesdeCuando, Como)
+
+conoce(wirbel, hazania(rescatarALaHermanaDeWirbel, [stark, fern], klares), 1390, presencio).
+conoce(frieren, hazania(rescatarALaHermanaDeWirbel, [stark, fern], klares), 1390, presencio).
+conoce(lawine, hazania(destruirAlDemonioAura, [frieren], weise), 1393, escucho).
+conoce(voll, hazania(destruirAlDemonioAura, [denken], auberst), 1400, leyo(50)).
+conoce(serie, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), 1335, leyo(100)).
+conoce(kanne, hazania(recuperarAlGatoPerdido, [frieren, himmel], weise), 1375, presencio).
+
+
+esRecordada(Hazania, Persona, AnioDado):-
+    conoce(Persona, Hazania, AnioQuePresencio, presencio),
+    AnioQuePresencio =< AnioDado,
+    estaViva(Persona, AnioDado).
+
+esRecordada(Hazania, Persona, AnioDado):-
+    conoce(Persona, Hazania, AnioQueEscucho, escucho),
+    AnioQueEscucho =< AnioDado,
+    AnioDado =< AnioQueEscucho + 15.
+
+esRecordada(Hazania, Persona, AnioDado):-
+    conoce(Persona, Hazania, AnioQueLeyo, leyo(Paginas)),
+    AnioQueLeyo =< AnioDado,
+    AnioDado =< AnioQueLeyo + Paginas.
 
 
 
+tieneVersionesDistintas(NombreHazania):-
+    conoce(_, hazania(NombreHazania, Quienes1, Donde1), _, _ ),
+    conoce(_, hazania(NombreHazania, Quienes2, Donde2), _, _ ),
+    hazania(NombreHazania, Quienes1, Donde1) \= hazania(NombreHazania, Quienes2, Donde2).
+
+estaCorroborada(NombreHazania):-
+    conoce(_, hazania(NombreHazania, _, _), _, _),
+    not(tieneVersionesDistintas(NombreHazania)).
 
 
-
-
+pasoAlOlvido(Hazania, AnioDado):-
+    conoce(_, Hazania, _, _),   
+    not(esRecordada(Hazania, _, AnioDado)).
 
 
 
