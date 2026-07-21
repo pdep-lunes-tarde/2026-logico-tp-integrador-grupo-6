@@ -80,25 +80,84 @@ pasoAlOlvido(NombreHazania, AnioDado):-
 
 % parte 3 
 
-% diaFestivo(Pueblo, Hazania, AnioInicio).
+% % diaFestivo(Pueblo, Hazania, AnioInicio).
 
-diaFestivo(weise, destruirReyDemonio, 1340).
+% diaFestivo(weise, destruirReyDemonio, 1340).
 
-% estatua(Pueblo, Nombre, Material, Hazania, AnioConstruccion).
+% % estatua(Pueblo, Nombre, Material, Hazania, AnioConstruccion).
 
-estatua(auberst, "el equipo de heroes", bronce, destruirReyDemonio, 1370).
-estatua(auberst, "el heroe del sur", marmol, destruirSchlatOmnisciente, 1340).
+% estatua(auberst, "el equipo de heroes", bronce, destruirReyDemonio, 1370).
+% estatua(auberst, "el heroe del sur", marmol, destruirSchlatOmnisciente, 1340).
 
-% mantenimiento(NombreEstatua, Anio).
+% % mantenimiento(NombreEstatua, Anio).
 
-mantenimiento("el equipo de heroes", 1400).
-mantenimiento("el equipo de heroes", 1450).
+% mantenimiento("el equipo de heroes", 1400).
+% mantenimiento("el equipo de heroes", 1450).
 
-mantenimiento("el heroe del sur", 1410).
-
-
+% mantenimiento("el heroe del sur", 1410).
 
 
+% conmemora(Pueblo, Hazania, FechaDeConmemoracion)
+
+conmemora(weise, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), diaFestivo(1340)).
+
+conmemora(auberst, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), estatua(elEquipoDeHeroes, bronce ,1370)).
+conmemora(auberst, hazania(destruirASchlatElOmnisciente, [heroeDelSur], ende), estatua(elHeroeDelSur, marmol, 1340)).
+
+
+mantenimiento(elEquipoDeHeroes, 1400).
+mantenimiento(elHeroeDelSur, 1450).
+
+
+esRecordada(NombreHazania, Persona , AnioDado):-
+    habitante(Persona, _, AnioNacimiento, PuebloDondeVive),
+    conmemora(PuebloDondeVive, hazania(NombreHazania, _, _), diaFestivo(AnioInicio)),
+    
+    cuandoConocio(AnioNacimiento, AnioInicio, AnioQueConocio),
+    AnioQueConocio =< AnioDado,
+
+    estaViva(Persona, AnioDado).
+
+
+esRecordada(NombreHazania, Persona , AnioDado):-
+    habitante(Persona, _, AnioNacimiento, PuebloDondeVive),
+    conmemora(PuebloDondeVive, hazania(NombreHazania, _, _), estatua(NombreEstatua, Material, AnioConstruccion)),
+    
+    estaEnBuenEstado(NombreEstatua, AnioDado),
+    
+    cuandoConocio(AnioNacimiento, AnioConstruccion, AnioQueConocio),
+    AnioQueConocio =< AnioDado,
+    
+    estaViva(Persona, AnioDado).
+
+
+cuandoConocio(AnioNacimiento, AnioInicio, AnioInicio):-
+    AnioNacimiento =< AnioInicio.
+
+cuandoConocio(AnioNacimiento, AnioInicio, AnioNacimiento):-
+    AnioNacimiento > AnioInicio.
+
+
+estaEnBuenEstado(NombreEstatua, AnioDado) :-
+    conmemora(_, _, estatua(NombreEstatua, marmol, _)),
+    mantenimiento(NombreEstatua, AnioMantenimiento),
+    AnioMantenimiento =< AnioDado,
+    AnioDado - AnioMantenimiento =< 30.
+
+estaEnBuenEstado(NombreEstatua, AnioDado) :-
+    conmemora(_, _, estatua(NombreEstatua, marmol, AnioConstruccion)),
+    AnioDado - AnioConstruccion=< 30.
+
+
+estaEnBuenEstado(NombreEstatua, AnioDado) :-
+    conmemora(_, _, estatua(NombreEstatua, bronce, _)),
+    mantenimiento(NombreEstatua, AnioMantenimiento),
+    AnioMantenimiento =< AnioDado,
+    AnioDado - AnioMantenimiento =< 15.
+
+estaEnBuenEstado(NombreEstatua, AnioDado) :-
+    conmemora(_, _, estatua(NombreEstatua, bronce, AnioConstruccion)),
+    AnioDado - AnioConstruccion =< 15.
 
 
 
@@ -160,6 +219,17 @@ test("destruir al demonio Aura no pasó al olvidó en 1440"):-
     not(pasoAlOlvido(destruirAlDemonioAura, 1400)).
 
 
+% Tests parte 3
+
+
+test("Lawine recuerda destruir al rey demonio en 1400"):-
+    esRecordada(destruirAlReyDemonio, lawine, 1400).
+
+test("Lawine no recuerda destruir al rey demonio en 1390"):-
+    not(esRecordada(destruirAlReyDemonio, lawine, 1390)).
+
+test("Fern recuerda destruir al rey demonio en 1400"):-
+    esRecordada(destruirAlReyDemonio, fern, 1400).
 
 
 :- end_tests(tpIntegrador).
