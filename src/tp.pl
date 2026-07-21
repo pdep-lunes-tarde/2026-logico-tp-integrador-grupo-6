@@ -46,18 +46,18 @@ conoce(serie, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], en
 conoce(kanne, hazania(recuperarAlGatoPerdido, [frieren, himmel], weise), 1375, presencio).
 
 
-esRecordada(Hazania, Persona, AnioDado):-
-    conoce(Persona, Hazania, AnioQuePresencio, presencio),
+esRecordada(NombreHazania, Persona, AnioDado):-
+    conoce(Persona, hazania(NombreHazania, _, _), AnioQuePresencio, presencio),
     AnioQuePresencio =< AnioDado,
     estaViva(Persona, AnioDado).
 
-esRecordada(Hazania, Persona, AnioDado):-
-    conoce(Persona, Hazania, AnioQueEscucho, escucho),
+esRecordada(NombreHazania, Persona, AnioDado):-
+    conoce(Persona, hazania(NombreHazania, _, _), AnioQueEscucho, escucho),
     AnioQueEscucho =< AnioDado,
     AnioDado =< AnioQueEscucho + 15.
 
-esRecordada(Hazania, Persona, AnioDado):-
-    conoce(Persona, Hazania, AnioQueLeyo, leyo(Paginas)),
+esRecordada(NombreHazania, Persona, AnioDado):-
+    conoce(Persona, hazania(NombreHazania, _, _), AnioQueLeyo, leyo(Paginas)),
     AnioQueLeyo =< AnioDado,
     AnioDado =< AnioQueLeyo + Paginas.
 
@@ -73,10 +73,9 @@ estaCorroborada(NombreHazania):-
     not(tieneVersionesDistintas(NombreHazania)).
 
 
-pasoAlOlvido(Hazania, AnioDado):-
-    conoce(_, Hazania, _, _),   
-    not(esRecordada(Hazania, _, AnioDado)).
-
+pasoAlOlvido(NombreHazania, AnioDado):-
+    conoce(_, hazania(NombreHazania, _, _), _, _),   
+    not(esRecordada(NombreHazania, _, AnioDado)).
 
 
 
@@ -89,6 +88,7 @@ pasoAlOlvido(Hazania, AnioDado):-
 
 :- begin_tests(tpIntegrador, []).
 
+% Tests parte 1
 
 test("kanne esta viva en 1370") :-
     estaViva(kanne, 1370).
@@ -107,6 +107,43 @@ test("voll ya no esta vivo en 1551") :-
 
 test("serie esta viva en 5000") :-
     estaViva(serie, 5000).
+
+% Tests parte 2
+
+test("Lawine no recuerda destruir al demonio Aura en 1380") :-
+    not(esRecordada(destruirAlDemonioAura, lawine, 1380)).
+
+test("Lawine recuerda destruir al demonio Aura en 1400"):-
+    esRecordada(destruirAlDemonioAura, lawine, 1400).
+
+test("Lawine ya no recuerda destruir al demonio Aura en 1410"):-
+    not(esRecordada(destruirAlDemonioAura, lawine, 1410)).
+
+test("Voll recuerda destruir al demonio Aura en 1450"):-
+    esRecordada(destruirAlDemonioAura, voll, 1450).
+
+test("Voll no recuerda destruir al demonio Aura en 1460"):-
+    not(esRecordada(destruirAlDemonioAura, voll, 1460)).
+
+test("Wirbel recuerda rescatar a la hermana de wirbel en 1430"):-
+    esRecordada(rescatarALaHermanaDeWirbel, wirbel, 1430).
+
+test("Wirbel ya no recuerda rescatar a la hermana de wirbel en 1440"):-
+    not(esRecordada(rescatarALaHermanaDeWirbel, wirbel, 1440)).   
+
+test("rescatar a la hermana de Wirbel es una hazaña corroborada"):-
+    estaCorroborada(rescatarALaHermanaDeWirbel).
+
+test("destruir al demonio Aura no es una hazaña corroborada"):-
+    not(estaCorroborada(destruirAlDemonioAura)).
+
+test("destruir al demonio Aura pasó al olvidó en 1460"):-
+    pasoAlOlvido(destruirAlDemonioAura, 1460).
+
+test("destruir al demonio Aura no pasó al olvidó en 1440"):-
+    not(pasoAlOlvido(destruirAlDemonioAura, 1400)).
+
+
 
 
 :- end_tests(tpIntegrador).
