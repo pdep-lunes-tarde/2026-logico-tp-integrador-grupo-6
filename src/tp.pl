@@ -80,22 +80,6 @@ pasoAlOlvido(NombreHazania, AnioDado):-
 
 % parte 3 
 
-% % diaFestivo(Pueblo, Hazania, AnioInicio).
-
-% diaFestivo(weise, destruirReyDemonio, 1340).
-
-% % estatua(Pueblo, Nombre, Material, Hazania, AnioConstruccion).
-
-% estatua(auberst, "el equipo de heroes", bronce, destruirReyDemonio, 1370).
-% estatua(auberst, "el heroe del sur", marmol, destruirSchlatOmnisciente, 1340).
-
-% % mantenimiento(NombreEstatua, Anio).
-
-% mantenimiento("el equipo de heroes", 1400).
-% mantenimiento("el equipo de heroes", 1450).
-
-% mantenimiento("el heroe del sur", 1410).
-
 
 % conmemora(Pueblo, Hazania, FechaDeConmemoracion)
 
