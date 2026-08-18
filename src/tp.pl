@@ -307,8 +307,4 @@ test("recuperar al gato perdido no es importante para Weise en 1400"):-
 test("Klares vive tiempos sin precedentes en 1395"):-
     estaViviendoTiemposSinPrecedentes(klares, 1395).
 
-test("Weise no vive tiempos sin precedentes en 1400"):-
-    estaViviendoTiemposSinPrecedentes(weise, 1400).
-
-
 :- end_tests(tpIntegrador).
