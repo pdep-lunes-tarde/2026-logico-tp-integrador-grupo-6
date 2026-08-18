@@ -1,6 +1,8 @@
 
 % Parte 1
 
+% Punto 1
+
 % habitante(Nombre, Raza, AnioNacimiento, Pueblo).
 
 habitante(denken, humano, 1290, auberst).
@@ -34,7 +36,7 @@ estaViva(Persona, AnioDado):-
 
 
 
-% Parte 2
+% Punto 2
 
 % conoce(Quien, Hazania, DesdeCuando, Como)
 
@@ -78,7 +80,7 @@ pasoAlOlvido(NombreHazania, AnioDado):-
     not(esRecordada(NombreHazania, _, AnioDado)).
 
 
-% parte 3 
+% Punto 3
 
 
 % conmemora(Pueblo, Hazania, FechaDeConmemoracion)
@@ -143,11 +145,65 @@ estaEnBuenEstado(NombreEstatua, AnioDado) :-
     conmemora(_, _, estatua(NombreEstatua, bronce, AnioConstruccion)),
     AnioDado - AnioConstruccion =< 15.
 
+% Parte 2
 
+% Punto 4
+
+seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado):-
+    habitante(Persona, _, _, Pueblo),
+    esRecordada(NombreHazania, Persona, AnioDado).
+
+paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
+    findall(Paginas,
+            (habitante(Persona, _, _, Pueblo),
+             conoce(Persona, hazania(_, _, _), AnioDado, leyo(Paginas))),
+            ListaPaginas),
+    sum_list(ListaPaginas, TotalPaginas).
+
+esMasLector(Pueblo1, Pueblo2, AnioDado):-
+    paginasLeidasEnPueblo(Pueblo1, AnioDado, Paginas1),
+    paginasLeidasEnPueblo(Pueblo2, AnioDado, Paginas2),
+    Paginas1 > Paginas2.
+
+puebloMasLector(Pueblo, AnioDado):-
+    habitante(_, _, _, Pueblo),
+    forall(
+        (habitante(_, _, _, OtroPueblo), Pueblo \= OtroPueblo),
+        esMasLector(Pueblo, OtroPueblo, AnioDado)
+    ).
+
+esChismoso(Pueblo, AnioDado):-
+    habitante(_, _, _, Pueblo),
+    not((
+        seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
+        estaCorroborada(NombreHazania)
+    )).
+
+esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
+    habitante(_, _, _, Pueblo),
+    forall(
+        (habitante(Persona, _, _, Pueblo),
+         estaViva(Persona, AnioDado)),
+        esRecordada(NombreHazania, Persona, AnioDado)
+    ).
+
+estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
+    habitante(_, _, _, Pueblo),
+    forall(
+        (seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
+         esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
+        (
+            conoce(Persona, hazania(NombreHazania, _, Pueblo),
+                   AnioPresencio, presencio),
+            habitante(Persona, _, _, Pueblo),
+            AnioPresencio =< AnioDado
+        )
+    ).
+% FALTA PORQUE ES MUSICAL 
 
 :- begin_tests(tpIntegrador, []).
 
-% Tests parte 1
+% Tests punto 1
 
 test("kanne esta viva en 1370") :-
     estaViva(kanne, 1370).
@@ -167,7 +223,7 @@ test("voll ya no esta vivo en 1551") :-
 test("serie esta viva en 5000") :-
     estaViva(serie, 5000).
 
-% Tests parte 2
+% Tests punto 2
 
 test("Lawine no recuerda destruir al demonio Aura en 1380") :-
     not(esRecordada(destruirAlDemonioAura, lawine, 1380)).
@@ -203,7 +259,7 @@ test("destruir al demonio Aura no pasó al olvidó en 1440"):-
     not(pasoAlOlvido(destruirAlDemonioAura, 1400)).
 
 
-% Tests parte 3
+% Tests punto 3
 
 
 test("Lawine recuerda destruir al rey demonio en 1400"):-
@@ -214,6 +270,45 @@ test("Lawine no recuerda destruir al rey demonio en 1390"):-
 
 test("Fern recuerda destruir al rey demonio en 1400"):-
     esRecordada(destruirAlReyDemonio, fern, 1400).
+
+
+% test punto 4
+
+test("En Weise se recuerda destruir al rey demonio en 1400"):-
+    seRecuerdaEnPueblo(weise, destruirAlReyDemonio, 1400).
+
+test("En Klares se recuerda rescatar a la hermana de Wirbel en 1395"):-
+    seRecuerdaEnPueblo(klares, rescatarALaHermanaDeWirbel, 1395).
+
+test("En Klares no se recuerda destruir al rey demonio en 1395"):-
+    not(seRecuerdaEnPueblo(klares, destruirAlReyDemonio, 1395)).
+
+test("En Weise se leyeron 100 páginas en 1335"):-
+    paginasLeidasEnPueblo(weise, 1335, 100).
+
+test("En Weise se leyeron 0 páginas en 1336"):-
+    paginasLeidasEnPueblo(weise, 1336, 0).
+
+test("Ende es el pueblo más lector en 1400"):-
+    puebloMasLector(ende, 1400).
+
+test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada"):-
+    esChismoso(ende, 1420).
+
+test("Weise no es chismoso en 1400"):-
+    not(esChismoso(weise, 1400)).
+
+test("destruir al rey demonio es importante para Weise en 1400"):-
+    esImportanteParaPueblo(destruirAlReyDemonio, weise, 1400).
+
+test("recuperar al gato perdido no es importante para Weise en 1400"):-
+    not(esImportanteParaPueblo(recuperarAlGatoPerdido, weise, 1400)).
+
+test("Klares vive tiempos sin precedentes en 1395"):-
+    estaViviendoTiemposSinPrecedentes(klares, 1395).
+
+test("Weise no vive tiempos sin precedentes en 1400"):-
+    estaViviendoTiemposSinPrecedentes(weise, 1400).
 
 
 :- end_tests(tpIntegrador).
