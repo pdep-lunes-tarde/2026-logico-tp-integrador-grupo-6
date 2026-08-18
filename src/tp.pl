@@ -19,21 +19,17 @@ habitante(eisen, enano, 1150, riegel).
 
 
 estaViva(Persona, AnioDado):-
-    habitante(Persona, humano, AnioNacimiento, _),
+    habitante(Persona, Raza, AnioNacimiento, _),
     AnioNacimiento=<AnioDado,
+    sigueConVida(Raza, AnioNacimiento, AnioDado).
+
+sigueConVida(humano, AnioNacimiento, AnioDado):-
     AnioDado =< AnioNacimiento + 80.
 
-
-estaViva(Persona, AnioDado):-
-    habitante(Persona, enano, AnioNacimiento, _),
-    AnioNacimiento=<AnioDado,
+sigueConVida(enano, AnioNacimiento, AnioDado):-
     AnioDado =< AnioNacimiento + 350.
 
-
-estaViva(Persona, AnioDado):-
-    habitante(Persona, elfo, AnioNacimiento, _),
-    AnioNacimiento=<AnioDado.
-
+sigueConVida(elfo, _, _).
 
 
 % Punto 2
@@ -49,19 +45,19 @@ conoce(kanne, hazania(recuperarAlGatoPerdido, [frieren, himmel], weise), 1375, p
 
 
 esRecordada(NombreHazania, Persona, AnioDado):-
-    conoce(Persona, hazania(NombreHazania, _, _), AnioQuePresencio, presencio),
-    AnioQuePresencio =< AnioDado,
-    estaViva(Persona, AnioDado).
+    conoce(Persona, hazania(NombreHazania, _, _), AnioQueConocio, Medio),
+    AnioQueConocio =< AnioDado,
+    estaViva(Persona, AnioDado),
+    sigueRecordando(Medio, AnioQueConocio, AnioDado).
 
-esRecordada(NombreHazania, Persona, AnioDado):-
-    conoce(Persona, hazania(NombreHazania, _, _), AnioQueEscucho, escucho),
-    AnioQueEscucho =< AnioDado,
-    AnioDado =< AnioQueEscucho + 15.
 
-esRecordada(NombreHazania, Persona, AnioDado):-
-    conoce(Persona, hazania(NombreHazania, _, _), AnioQueLeyo, leyo(Paginas)),
-    AnioQueLeyo =< AnioDado,
-    AnioDado =< AnioQueLeyo + Paginas.
+sigueRecordando(presencio, _, _).
+
+sigueRecordando(escucho, AnioQueConocio, AnioDado):-
+    AnioDado =< AnioQueConocio + 15.
+
+sigueRecordando(leyo(Paginas), AnioQueConocio, AnioDado):-
+    AnioDado =< AnioQueConocio + Paginas.
 
 
 
@@ -83,69 +79,54 @@ pasoAlOlvido(NombreHazania, AnioDado):-
 % Punto 3
 
 
-% conmemora(Pueblo, Hazania, FechaDeConmemoracion)
+% conmemora(Pueblo, Hazania, FechaDeConmemoracion, ComoConmemora)
 
-conmemora(weise, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), diaFestivo(1340)).
+conmemora(weise, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), 1340, diaFestivo).
 
-conmemora(auberst, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), estatua(elEquipoDeHeroes, bronce ,1370)).
-conmemora(auberst, hazania(destruirASchlatElOmnisciente, [heroeDelSur], ende), estatua(elHeroeDelSur, marmol, 1340)).
-
+% Auberst
+conmemora(auberst, hazania(destruirAlReyDemonio, [frieren, himmel, heiter, eisen], ende), 1370, estatua(elEquipoDeHeroes, bronce)).
+conmemora(auberst, hazania(destruirASchlatElOmnisciente, [heroeDelSur], ende), 1340, estatua(elHeroeDelSur, marmol)).
 
 mantenimiento(elEquipoDeHeroes, 1400).
 mantenimiento(elHeroeDelSur, 1450).
 
 
-esRecordada(NombreHazania, Persona , AnioDado):-
-    habitante(Persona, _, AnioNacimiento, PuebloDondeVive),
-    conmemora(PuebloDondeVive, hazania(NombreHazania, _, _), diaFestivo(AnioInicio)),
-    
-    cuandoConocio(AnioNacimiento, AnioInicio, AnioQueConocio),
-    AnioQueConocio =< AnioDado,
 
-    estaViva(Persona, AnioDado).
+conoce(Persona, Hazania, AnioQueConocio, ComoConmemora):-
+    habitante(Persona, _, AnioNacimiento, Pueblo),
+    conmemora(Pueblo, Hazania, AnioInicio, ComoConmemora),
+    maximo(AnioNacimiento, AnioInicio, AnioQueConocio).
 
 
-esRecordada(NombreHazania, Persona , AnioDado):-
-    habitante(Persona, _, AnioNacimiento, PuebloDondeVive),
-    conmemora(PuebloDondeVive, hazania(NombreHazania, _, _), estatua(NombreEstatua, Material, AnioConstruccion)),
-    
-    estaEnBuenEstado(NombreEstatua, AnioDado),
-    
-    cuandoConocio(AnioNacimiento, AnioConstruccion, AnioQueConocio),
-    AnioQueConocio =< AnioDado,
-    
-    estaViva(Persona, AnioDado).
+maximo(Valor1, Valor2, Valor2):-
+    Valor1 =< Valor2.
+
+maximo(Valor1, Valor2, Valor1):-
+    Valor1 > Valor2.
+
+sigueRecordando(diaFestivo, _, _).
+
+sigueRecordando(estatua(NombreEstatua, Material), _, AnioDado) :-
+    conmemora(_, _, AnioConstruccion, estatua(NombreEstatua, Material)),
+    estaEnBuenEstado(NombreEstatua, Material, AnioConstruccion, AnioDado).
 
 
-cuandoConocio(AnioNacimiento, AnioInicio, AnioInicio):-
-    AnioNacimiento =< AnioInicio.
 
-cuandoConocio(AnioNacimiento, AnioInicio, AnioNacimiento):-
-    AnioNacimiento > AnioInicio.
+duracion_material(marmol, 30).
+duracion_material(bronce, 15).
 
-
-estaEnBuenEstado(NombreEstatua, AnioDado) :-
-    conmemora(_, _, estatua(NombreEstatua, marmol, _)),
+estaEnBuenEstado(NombreEstatua, Material, _, AnioDado) :-
+    duracion_material(Material, DuracionMaxima),
     mantenimiento(NombreEstatua, AnioMantenimiento),
     AnioMantenimiento =< AnioDado,
-    AnioDado - AnioMantenimiento =< 30.
+    AnioDado - AnioMantenimiento =< DuracionMaxima.
 
-estaEnBuenEstado(NombreEstatua, AnioDado) :-
-    conmemora(_, _, estatua(NombreEstatua, marmol, AnioConstruccion)),
-    AnioDado - AnioConstruccion=< 30.
+estaEnBuenEstado(_, Material, AnioConstruccion, AnioDado) :-
+    duracion_material(Material, DuracionMaxima),
+    AnioDado - AnioConstruccion =< DuracionMaxima.
 
 
-estaEnBuenEstado(NombreEstatua, AnioDado) :-
-    conmemora(_, _, estatua(NombreEstatua, bronce, _)),
-    mantenimiento(NombreEstatua, AnioMantenimiento),
-    AnioMantenimiento =< AnioDado,
-    AnioDado - AnioMantenimiento =< 15.
-
-estaEnBuenEstado(NombreEstatua, AnioDado) :-
-    conmemora(_, _, estatua(NombreEstatua, bronce, AnioConstruccion)),
-    AnioDado - AnioConstruccion =< 15.
-
-% Parte 2
+%----------------------------------------Parte 2-----------------------------------------------------------------%
 
 % Punto 4
 
@@ -204,72 +185,71 @@ estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
 :- begin_tests(tpIntegrador, []).
 
 % Tests punto 1
-
-test("kanne esta viva en 1370") :-
-    estaViva(kanne, 1370).
-
-test("kanne no esta viva en 1300") :-
+test("Nadie esta vivo en un anio anterior a su nacimiento") :- 
     not(estaViva(kanne, 1300)).
 
-test("kanne no esta viva en 2000") :-
+test("Un humano esta vivo si el anio dado esta dentro de su expectativa de vida") :- 
+    estaViva(kanne, 1370).
+
+test("Un humano ya no esta vivo si supero su expectativa de vida") :- 
     not(estaViva(kanne, 2000)).
 
-test("voll esta vivo en 1550") :-
+test("Un enano esta vivo si el anio dado esta dentro de su expectativa de vida") :- 
     estaViva(voll, 1550).
 
-test("voll ya no esta vivo en 1551") :-
+test("Un enano ya no esta vivo si supero su expectativa de vida") :- 
     not(estaViva(voll, 1551)).
 
-test("serie esta viva en 5000") :-
+test("Un elfo esta vivo en cualquier anio posterior a su nacimiento porque es inmortal") :- 
     estaViva(serie, 5000).
+
 
 % Tests punto 2
 
-test("Lawine no recuerda destruir al demonio Aura en 1380") :-
+test("Una persona no puede recordar una hazania en un anio anterior a conocerla") :- 
     not(esRecordada(destruirAlDemonioAura, lawine, 1380)).
 
-test("Lawine recuerda destruir al demonio Aura en 1400"):-
+test("Una persona recuerda una hazania si el anio esta dentro de la duracion de su recuerdo"):- 
     esRecordada(destruirAlDemonioAura, lawine, 1400).
 
-test("Lawine ya no recuerda destruir al demonio Aura en 1410"):-
+test("Una persona deja de recordar una hazania cuando termina el tiempo de ese recuerdo"):- 
     not(esRecordada(destruirAlDemonioAura, lawine, 1410)).
 
-test("Voll recuerda destruir al demonio Aura en 1450"):-
+test("Una persona recuerda una hazania si el anio esta dentro de la duracion de su recuerdo"):- 
     esRecordada(destruirAlDemonioAura, voll, 1450).
 
-test("Voll no recuerda destruir al demonio Aura en 1460"):-
+test("Una persona deja de recordar una hazania cuando termina el tiempo de ese recuerdo"):- 
     not(esRecordada(destruirAlDemonioAura, voll, 1460)).
 
-test("Wirbel recuerda rescatar a la hermana de wirbel en 1430"):-
+test("Una persona recuerda una hazania que presencio toda su vida"):- 
     esRecordada(rescatarALaHermanaDeWirbel, wirbel, 1430).
 
-test("Wirbel ya no recuerda rescatar a la hermana de wirbel en 1440"):-
+test("Una persona no puede recordar una hazania si ya fallecio"):- 
     not(esRecordada(rescatarALaHermanaDeWirbel, wirbel, 1440)).   
 
-test("rescatar a la hermana de Wirbel es una hazaña corroborada"):-
+test("Una hazania esta corroborada si las diferentes personas que la conocen están de acuerdo en lugar y héroes que la llevaron a cabo"):- 
     estaCorroborada(rescatarALaHermanaDeWirbel).
 
-test("destruir al demonio Aura no es una hazaña corroborada"):-
+test("Una hazania no esta corroborada si las diferentes personas que la conocen no están de acuerdo ni en lugar ni en los héroes que la llevaron a cabo"):- 
     not(estaCorroborada(destruirAlDemonioAura)).
 
-test("destruir al demonio Aura pasó al olvidó en 1460"):-
+test("Una hazania pasa al olvido si ya no existe ninguna persona viva que la recuerde"):- 
     pasoAlOlvido(destruirAlDemonioAura, 1460).
 
-test("destruir al demonio Aura no pasó al olvidó en 1440"):-
+test("Una hazania no pasa al olvido si todavia hay al menos una persona viva que la recuerde"):- 
     not(pasoAlOlvido(destruirAlDemonioAura, 1400)).
-
 
 % Tests punto 3
 
-
-test("Lawine recuerda destruir al rey demonio en 1400"):-
-    esRecordada(destruirAlReyDemonio, lawine, 1400).
-
-test("Lawine no recuerda destruir al rey demonio en 1390"):-
+test("Un habitante no recuerda una hazania por estatua si pasaron mas de 15 anios de construccion sin mantenimiento"):- 
     not(esRecordada(destruirAlReyDemonio, lawine, 1390)).
 
-test("Fern recuerda destruir al rey demonio en 1400"):-
+test("Un habitante recupera el recuerdo por estatua si esta tuvo mantenimiento reciente"):- 
+    esRecordada(destruirAlReyDemonio, lawine, 1400).
+
+test("Un habitante recuerda una hazania conmemorada por un dia festivo mientras siga con vida"):- 
     esRecordada(destruirAlReyDemonio, fern, 1400).
+
 
 
 % test punto 4
