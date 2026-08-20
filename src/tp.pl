@@ -137,7 +137,7 @@ seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado):-
 paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
     findall(Paginas,
             (habitante(Persona, _, _, Pueblo),
-             conoce(Persona, hazania(_, _, _), AnioDado, leyo(Paginas))),
+            conoce(Persona, hazania(_, _, _), AnioDado, leyo(Paginas))),
             ListaPaginas),
     sum_list(ListaPaginas, TotalPaginas).
 
@@ -164,7 +164,7 @@ esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
     forall(
         (habitante(Persona, _, _, Pueblo),
-         estaViva(Persona, AnioDado)),
+        estaViva(Persona, AnioDado)),
         esRecordada(NombreHazania, Persona, AnioDado)
     ).
 
@@ -172,15 +172,40 @@ estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
     forall(
         (seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
-         esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
+        esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
         (
             conoce(Persona, hazania(NombreHazania, _, Pueblo),
-                   AnioPresencio, presencio),
+                AnioPresencio, presencio),
             habitante(Persona, _, _, Pueblo),
             AnioPresencio =< AnioDado
         )
     ).
 % FALTA PORQUE ES MUSICAL 
+
+% Punto 5
+
+esHeroe(Persona):-
+    habitante(Persona,_,_,_),
+    conoce(_,hazania(_,Participantes,_),_,_),
+    member(Persona,Participantes).
+
+inspiroHeroe(Heroe,Inspirador):-
+    habitante(Heroe,_,_,_),
+    conoce(Heroe,hazania(_,Participantes,_),_,_),
+    member(Inspirador,Participantes),
+    Inspirador \= Heroe.
+
+cadenaInspiracion(Heroe,Cadena):-
+    cadenaRecursiva(Heroe,[Heroe],Cadena). % En Cadena almacenamos los heroes que cumplen 
+
+cadenaRecursiva(HeroeActual, Visitados, Visitados). % Caso Base utilizamos Visitados como una memoria para chequear q no haya loopps
+
+cadenaRecursiva(HeroeActual, Visitados, Cadena):-
+    inspiroHeroe(HeroeActual,SiguienteHeroe),
+        not(member(SiguienteHeroe, Visitados)), % Chequeamos 
+        cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
+
+
 
 :- begin_tests(tpIntegrador, []).
 
@@ -286,5 +311,31 @@ test("recuperar al gato perdido no es importante para Weise en 1400"):-
 
 test("Klares vive tiempos sin precedentes en 1395"):-
     estaViviendoTiemposSinPrecedentes(klares, 1395).
+
+% Tests Punto 5
+
+test("Alguien que participo en al menos una hazania que alguien conoce es un heroe"):-
+    esHeroe(frieren).
+
+test("Alguien que nunca particio en una hazania no puede ser un heroe"):-
+    not(esHeroe(wirbel)).
+
+test("Un heroe fue inspirado por otra persona si este segundo participo en una que el heroe conoce"):-
+    inspiroHeroe(fern,frieren).
+
+test("Un Personaje fue inspirado por otra persona ya que este segundo participo en una hazania que Personaje conoce"):-
+    inspiroHeroe(frieren,stark).
+
+test("Nadie inspira a un heroe del que no sabemos las hazanias que conoce"):-
+    not(inspiroHeroe(eisen,_)).
+
+test("Una cadena de inspiracion a un heroe en la que cada heroe siguiente inspira al anterior, no se repiten ni se forman bucles es valida"):-
+    cadenaInspiracion(himmel,[denken, frieren, fern, himmel,]). %Tuvimos q ponerlo al reves pq prolog construye la lista de atras hacia adelante 
+
+test("Una cadena de inspiracion en la que un personaje que aparece no inspiro al siguiente no es valida"):-
+    not(cadenaInspiracion(denken, [denken,frieren])).
+
+test("Una cadena de inspiracion en la que un personaje se repite no es valida"):-
+    not(cadenaInspiracion(frieren,[frieren,fern,frieren])).
 
 :- end_tests(tpIntegrador).
