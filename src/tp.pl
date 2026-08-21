@@ -330,7 +330,7 @@ test("Nadie inspira a un heroe del que no sabemos las hazanias que conoce"):-
     not(inspiroHeroe(eisen,_)).
 
 test("Una cadena de inspiracion a un heroe en la que cada heroe siguiente inspira al anterior, no se repiten ni se forman bucles es valida"):-
-    cadenaInspiracion(himmel,[denken, frieren, fern, himmel,]). %Tuvimos q ponerlo al reves pq prolog construye la lista de atras hacia adelante 
+    cadenaInspiracion(denken,[himmel, fern ,frieren , denken]).
 
 test("Una cadena de inspiracion en la que un personaje que aparece no inspiro al siguiente no es valida"):-
     not(cadenaInspiracion(denken, [denken,frieren])).
