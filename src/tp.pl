@@ -279,37 +279,37 @@ test("Un habitante recuerda una hazania conmemorada por un dia festivo mientras 
 
 % test punto 4
 
-test("En Weise se recuerda destruir al rey demonio en 1400"):-
+test("un pueblo puede recordad una hazania si es recordada por un habitante"):-
     seRecuerdaEnPueblo(weise, destruirAlReyDemonio, 1400).
 
-test("En Klares se recuerda rescatar a la hermana de Wirbel en 1395"):-
+test("un pueblo puede recordad una hazania si es recordada por un habitante"):-
     seRecuerdaEnPueblo(klares, rescatarALaHermanaDeWirbel, 1395).
 
-test("En Klares no se recuerda destruir al rey demonio en 1395"):-
+test("un pueblo no puede recordar una hazania si no es recordada por un habitante"):-
     not(seRecuerdaEnPueblo(klares, destruirAlReyDemonio, 1395)).
 
-test("En Weise se leyeron 100 páginas en 1335"):-
+test("se leen 100 paginas, si el total de paginas leidas entre todos los habitantes se suma a 100 en ese anio"):-
     paginasLeidasEnPueblo(weise, 1335, 100).
 
-test("En Weise se leyeron 0 páginas en 1336"):-
+test("se leen 0 paginas, si el total de paginas leidas entre todos los habitantes es 0 en ese anio"):-
     paginasLeidasEnPueblo(weise, 1336, 0).
 
-test("Ende es el pueblo más lector en 1400"):-
+test("En un anio cuando el pueblo es mas lector que cualquier otros, es el mas lector"):-
     puebloMasLector(ende, 1400).
 
-test("Ende es chismoso en 1420 ya que solo se recuerda destruir al demonio Aura que no está corroborada"):-
+test("un pueblo es chimoso, cuando una hazania en el anio no esta corroborada"):-
     esChismoso(ende, 1420).
 
-test("Weise no es chismoso en 1400"):-
+test("un pueblo no es chismoso, si la hazania de ese anio si esta corroborada."):-
     not(esChismoso(weise, 1400)).
 
-test("destruir al rey demonio es importante para Weise en 1400"):-
+test("cuando todos los habitantes de un pueblo recuerdan una hazania, esa hazania es la mas importante"):-
     esImportanteParaPueblo(destruirAlReyDemonio, weise, 1400).
 
-test("recuperar al gato perdido no es importante para Weise en 1400"):-
+test("cuando no todos los habitantes recuerdan una hazania en el anio, entonces no es importante para el pueblo"):-
     not(esImportanteParaPueblo(recuperarAlGatoPerdido, weise, 1400)).
 
-test("Klares vive tiempos sin precedentes en 1395"):-
+test("cuando alguien del pueblo precencio todas las hazanias importantes, se concidera que viven tiempos sin precedentes"):-
     estaViviendoTiemposSinPrecedentes(klares, 1395).
 
 % Tests Punto 5
