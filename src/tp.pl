@@ -205,6 +205,29 @@ cadenaRecursiva(HeroeActual, Visitados, Cadena):-
         not(member(SiguienteHeroe, Visitados)), % Chequeamos 
         cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
 
+% Punto 6
+
+dreamTeam(Heroe, Equipo):-
+    esHeroe(Heroe),
+    cadenaInspiracion(Heroe, Cadena),
+
+    generarEquipo(Cadena, [], Equipo),
+    member(Heroe, Equipo),
+    member(Otro, Equipo),
+    Heroe \= Otro.
+
+
+generarEquipo(_, Equipo, Equipo).
+
+generarEquipo(Cadena, Acumulador, EquipoFinal):-
+    
+    member(Integrante, Cadena),
+    not(member(Integrante, Acumulador)),
+
+    generarEquipo(Cadena, [Integrante | Acumulador], EquipoFinal).
+
+
+    
 
 
 :- begin_tests(tpIntegrador, []).
@@ -337,5 +360,20 @@ test("Una cadena de inspiracion en la que un personaje que aparece no inspiro al
 
 test("Una cadena de inspiracion en la que un personaje se repite no es valida"):-
     not(cadenaInspiracion(frieren,[frieren,fern,frieren])).
+
+
+% Test punto 6
+
+test("Un dream team es valido si incluye al heroe y un antecesor") :-
+    dreamTeam(fern, [fern, himmel]).
+
+test("Un dream team es valido sin importar el orden de sus integrantes") :-
+    dreamTeam(fern, [himmel, fern]).
+
+test("Un dream team no es valido si el heroe esta solo") :-
+    not(dreamTeam(fern, [fern])).
+
+test("Un dream team no es valido si no esta el propio heroe") :-
+    not(dreamTeam(fern, [frieren])).
 
 :- end_tests(tpIntegrador).
