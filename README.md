@@ -4,6 +4,11 @@
 
 **Equipo:** 
 
+    Jose Ignacio Irastorza Bauque - 213.801-3
+    Bruno Chiurazzi - 233.778-2
+    Francisco Martin Squeri - 234.226-1
+    Juan Andre Flores - 228.773-0
+
 ## Fecha de entrega de parte 1
 
 3 de agosto.
