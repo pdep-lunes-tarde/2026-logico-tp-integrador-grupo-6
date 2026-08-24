@@ -136,6 +136,7 @@ seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado):-
 
 
 paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
+    habitante(_, _, _, Pueblo),
     findall(Paginas,
             (habitante(Persona, _, _, Pueblo),
             conoce(Persona, hazania(_, _, _), AnioDado, leyo(Paginas))),
@@ -158,6 +159,7 @@ puebloMasLector(Pueblo, AnioDado):-
 
 
 esMusical(Pueblo, AnioDado):-
+    seRecuerdaEnPueblo(Pueblo, _, AnioDado),
     hazaniasRecordadas(Pueblo, AnioDado, Hazanias),
     hazaniasRecordadasPorCanciones(Pueblo, AnioDado, HazaniasPorCanciones),
     length(Hazanias, CantidadTotal),
@@ -188,7 +190,7 @@ hazaniasRecordadasPorCanciones(Pueblo, AnioDado, Hazanias):-
 
 
 esChismoso(Pueblo, AnioDado):-
-    habitante(_, _, _, Pueblo),
+    seRecuerdaEnPueblo(Pueblo, _, AnioDado),
     not((
         seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         estaCorroborada(NombreHazania)
@@ -205,7 +207,7 @@ esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
 
 
 estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
-    habitante(_, _, _, Pueblo),
+    esImportanteParaPueblo(_, Pueblo, AnioDado),
     forall(
         (seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
@@ -225,7 +227,7 @@ esHeroe(Persona):-
     member(Persona,Participantes).
 
 inspiroHeroe(Heroe,Inspirador):-
-    habitante(Heroe,_,_,_),
+    esHeroe(Heroe),
     conoce(Heroe,hazania(_,Participantes,_),_,_),
     member(Inspirador,Participantes),
     Inspirador \= Heroe.
@@ -241,7 +243,6 @@ cadenaRecursiva(HeroeActual, Visitados, Cadena):-
         cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
 
 % Punto 6
-
 dreamTeam(Heroe, Equipo):-
     esHeroe(Heroe),
     cadenaInspiracion(Heroe, Cadena),
