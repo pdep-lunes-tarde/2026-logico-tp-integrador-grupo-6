@@ -134,6 +134,7 @@ seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado):-
     habitante(Persona, _, _, Pueblo),
     esRecordada(NombreHazania, Persona, AnioDado).
 
+
 paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
     findall(Paginas,
             (habitante(Persona, _, _, Pueblo),
@@ -141,10 +142,12 @@ paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
             ListaPaginas),
     sum_list(ListaPaginas, TotalPaginas).
 
+
 esMasLector(Pueblo1, Pueblo2, AnioDado):-
     paginasLeidasEnPueblo(Pueblo1, AnioDado, Paginas1),
     paginasLeidasEnPueblo(Pueblo2, AnioDado, Paginas2),
     Paginas1 > Paginas2.
+
 
 puebloMasLector(Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
@@ -153,12 +156,44 @@ puebloMasLector(Pueblo, AnioDado):-
         esMasLector(Pueblo, OtroPueblo, AnioDado)
     ).
 
+
+esMusical(Pueblo, AnioDado):-
+    hazaniasRecordadas(Pueblo, AnioDado, Hazanias),
+    hazaniasRecordadasPorCanciones(Pueblo, AnioDado, HazaniasPorCanciones),
+    length(Hazanias, CantidadTotal),
+    length(HazaniasPorCanciones, CantidadCanciones),
+    CantidadCanciones * 2 > CantidadTotal.
+
+
+hazaniasRecordadas(Pueblo, AnioDado, Hazanias):-
+    findall(
+        NombreHazania,
+        seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
+        HazaniasRepetidas
+    ),
+    list_to_set(HazaniasRepetidas, Hazanias).
+
+
+hazaniasRecordadasPorCanciones(Pueblo, AnioDado, Hazanias):-
+    findall(
+        NombreHazania,
+        (
+            habitante(Persona, _, _, Pueblo),
+            conoce(Persona, hazania(NombreHazania, _, _), _, escucho),
+            esRecordada(NombreHazania, Persona, AnioDado)
+        ),
+        HazaniasRepetidas
+    ),
+    list_to_set(HazaniasRepetidas, Hazanias).
+
+
 esChismoso(Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
     not((
         seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         estaCorroborada(NombreHazania)
     )).
+
 
 esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
@@ -168,19 +203,19 @@ esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
         esRecordada(NombreHazania, Persona, AnioDado)
     ).
 
+
 estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
     habitante(_, _, _, Pueblo),
     forall(
         (seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
         (
-            conoce(Persona, hazania(NombreHazania, _, Pueblo),
-                AnioPresencio, presencio),
             habitante(Persona, _, _, Pueblo),
+            conoce(Persona, hazania(NombreHazania, _, _),
+                AnioPresencio, presencio),
             AnioPresencio =< AnioDado
         )
     ).
-% FALTA PORQUE ES MUSICAL 
 
 % Punto 5
 
