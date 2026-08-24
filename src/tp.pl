@@ -356,7 +356,7 @@ test("En un anio cuando el pueblo es mas lector que cualquier otros, es el mas l
     puebloMasLector(ende, 1400).
 
 test("Cuando un pueblo recuerda la mayoria de hazanias de ese anio con canciones o otras maneras, es musical"):-
-    esMusical(aubert, 1395).
+    esMusical(auberst, 1395).
 
 test("Cuando un pueblo no recuerda la mayoria de hazanias con canciones o otras maneras, no es musical"):-
     not(esMusical(weise, 1400)).
@@ -375,6 +375,9 @@ test("cuando no todos los habitantes recuerdan una hazania en el anio, entonces 
 
 test("cuando alguien del pueblo precencio todas las hazanias importantes, se concidera que viven tiempos sin precedentes"):-
     estaViviendoTiemposSinPrecedentes(klares, 1395).
+
+test("cuando alguien del pueblo no precencio una de las hazanias importantes, se concidera que no viven tiempos sin precedentes"):-
+    not(estaViviendoTiemposSinPrecedentes(weise, 1400)).
 
 % Tests Punto 5
 
