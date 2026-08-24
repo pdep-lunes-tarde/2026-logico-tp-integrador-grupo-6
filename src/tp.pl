@@ -355,6 +355,12 @@ test("se leen 0 paginas, si el total de paginas leidas entre todos los habitante
 test("En un anio cuando el pueblo es mas lector que cualquier otros, es el mas lector"):-
     puebloMasLector(ende, 1400).
 
+test("Cuando un pueblo recuerda la mayoria de hazanias de ese anio con canciones o otras maneras, es musical"):-
+    esMusical(aubert, 1395).
+
+test("Cuando un pueblo no recuerda la mayoria de hazanias con canciones o otras maneras, no es musical"):-
+    not(esMusical(weise, 1400)).
+
 test("un pueblo es chimoso, cuando una hazania en el anio no esta corroborada"):-
     esChismoso(ende, 1420).
 
