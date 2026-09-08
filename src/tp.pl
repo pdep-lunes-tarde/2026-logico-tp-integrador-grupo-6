@@ -168,6 +168,7 @@ esMusical(Pueblo, AnioDado):-
 
 
 hazaniasRecordadas(Pueblo, AnioDado, Hazanias):-
+    habitante(_, _, _, Pueblo),
     findall(
         NombreHazania,
         seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
@@ -177,6 +178,7 @@ hazaniasRecordadas(Pueblo, AnioDado, Hazanias):-
 
 
 hazaniasRecordadasPorCanciones(Pueblo, AnioDado, Hazanias):-
+    habitante(_, _, _, Pueblo),
     findall(
         NombreHazania,
         (
@@ -222,26 +224,26 @@ estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
 % Punto 5
 
 esHeroe(Persona):-
-    habitante(Persona,_,_,_),
-    conoce(_,hazania(_,Participantes,_),_,_),
-    member(Persona,Participantes).
+    habitante(Persona, _, _, _),
+    conoce(_, hazania(_, Participantes, _), _, _),
+    member(Persona, Participantes).
 
-inspiroHeroe(Heroe,Inspirador):-
+inspiroHeroe(Heroe, Inspirador):-
     esHeroe(Heroe),
-    conoce(Heroe,hazania(_,Participantes,_),_,_),
-    member(Inspirador,Participantes),
+    conoce(Heroe, hazania(_, Participantes, _), _, _),
+    member(Inspirador, Participantes),
     Inspirador \= Heroe.
 
-cadenaInspiracion(Heroe,Cadena):-
-    cadenaRecursiva(Heroe,[Heroe],Cadena). % En Cadena almacenamos los heroes que cumplen 
+cadenaInspiracion(Heroe, Cadena):-
+    esHeroe(Heroe),
+    cadenaRecursiva(Heroe, [Heroe], Cadena). % En Cadena almacenamos los heroes que cumplen 
 
-cadenaRecursiva(HeroeActual, Visitados, Visitados). % Caso Base utilizamos Visitados como una memoria para chequear q no haya loopps
+cadenaRecursiva(_, Visitados, Visitados).
 
 cadenaRecursiva(HeroeActual, Visitados, Cadena):-
-    inspiroHeroe(HeroeActual,SiguienteHeroe),
-        not(member(SiguienteHeroe, Visitados)), % Chequeamos 
-        cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
-
+    inspiroHeroe(HeroeActual, Antecesor),
+    not(member(Antecesor, Visitados)),
+    cadenaRecursiva(Antecesor, [Antecesor | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
 % Punto 6
 dreamTeam(Heroe, Equipo):-
     esHeroe(Heroe),
