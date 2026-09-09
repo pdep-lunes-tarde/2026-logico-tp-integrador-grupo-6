@@ -236,15 +236,18 @@ inspiroHeroe(Heroe, Inspirador):-
 
 cadenaInspiracion(Heroe, Cadena):-
     esHeroe(Heroe),
-    cadenaRecursiva(Heroe, [Heroe], Cadena).
+    cadenaRecursiva(Heroe, [], Cadena),
+    last(Cadena, Heroe).
 
-cadenaRecursiva(_, Visitados, Visitados).
+cadenaRecursiva(Heroe, Visitados, [Heroe]):-
+    not(member(Heroe, Visitados)).
 
-cadenaRecursiva(HeroeActual, Visitados, Cadena):-
-    inspiroHeroe(HeroeActual, Antecesor),
-    not(member(Antecesor, Visitados)),
-    append(Visitados, [Antecesor], NuevosVisitados),
-    cadenaRecursiva(Antecesor, NuevosVisitados, Cadena). % Utilizamos cadena para guardar el camino final de visitados
+cadenaRecursiva(Heroe, Visitados, Cadena):-
+    not(member(Heroe, Visitados)),
+    inspiroHeroe(Heroe, Inspirador),
+    cadenaRecursiva(Inspirador, [Heroe|Visitados], CadenaAnterior),
+    append(CadenaAnterior, [Heroe], Cadena).
+      
 % Punto 6
 dreamTeam(Heroe, Equipo):-
     esHeroe(Heroe),
