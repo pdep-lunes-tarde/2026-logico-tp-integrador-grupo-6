@@ -1,4 +1,3 @@
-
 % Parte 1
 
 % Punto 1
@@ -200,7 +199,7 @@ esChismoso(Pueblo, AnioDado):-
 
 
 esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
-    seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
+    habitante(_, _, _, Pueblo),
     forall(
         (habitante(Persona, _, _, Pueblo),
         estaViva(Persona, AnioDado)),
@@ -234,18 +233,13 @@ inspiroHeroe(Heroe, Inspirador):-
     member(Inspirador, Participantes),
     Inspirador \= Heroe.
 
-inspiraA(Inspirador, Inspirado):-
-    inspiroHeroe(Inspirado, Inspirador).
+cadenaInspiracion(Heroe, Cadena):-
+    esHeroe(Heroe),
+    cadenaRecursiva(Heroe, [], Cadena),
+    last(Cadena, Heroe).
 
-cadenaInspiracion(Heroe,Cadena):-
-    cadenaRecursiva(Heroe,[Heroe],Cadena). % En Cadena almacenamos los heroes que cumplen 
-
-cadenaRecursiva(HeroeActual, Visitados, Visitados). % Caso Base utilizamos Visitados como una memoria para chequear q no haya loopps
-
-cadenaRecursiva(HeroeActual, Visitados, Cadena):-
-    inspiraA(HeroeActual,SiguienteHeroe),
-        not(member(SiguienteHeroe, Visitados)), % Chequeamos 
-        cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
+cadenaRecursiva(Heroe, Visitados, [Heroe]):-
+    not(member(Heroe, Visitados)).
 
 cadenaRecursiva(Heroe, Visitados, Cadena):-
     not(member(Heroe, Visitados)),
@@ -254,17 +248,11 @@ cadenaRecursiva(Heroe, Visitados, Cadena):-
     append(CadenaAnterior, [Heroe], Cadena).
       
 % Punto 6
-
-subconjunto([], []).
-subconjunto([X|Xs], [X|Ys]) :- subconjunto(Xs, Ys).
-subconjunto([_|Xs], Ys) :- subconjunto(Xs, Ys).
-
 dreamTeam(Heroe, Equipo):-
     esHeroe(Heroe),
-    cadenaInspiracion(_, Cadena),
-    append(_, [Heroe | Antecesores], Cadena),
-    Antecesores \= [],
-    generarEquipo([Heroe | Antecesores], [], Equipo),
+    cadenaInspiracion(Heroe, Cadena),
+
+    generarEquipo(Cadena, [], Equipo),
     member(Heroe, Equipo),
     member(Otro, Equipo),
     Heroe \= Otro.
@@ -273,11 +261,13 @@ dreamTeam(Heroe, Equipo):-
 generarEquipo(_, Equipo, Equipo).
 
 generarEquipo(Cadena, Acumulador, EquipoFinal):-
-    
+
     member(Integrante, Cadena),
     not(member(Integrante, Acumulador)),
 
     generarEquipo(Cadena, [Integrante | Acumulador], EquipoFinal).
+
+
 
 
 
@@ -412,11 +402,11 @@ test("Un Personaje fue inspirado por otra persona ya que este segundo participo 
 test("Nadie inspira a un heroe del que no sabemos las hazanias que conoce"):-
     not(inspiroHeroe(eisen,_)).
 
-test("Una cadena de inspiracion en la que cada heroe inspira al siguiente, no se repiten ni se forman bucles es valida"):-
-    cadenaInspiracion(himmel,[denken, frieren, fern, himmel]).
+test("Una cadena de inspiracion a un heroe en la que cada heroe siguiente inspira al anterior, no se repiten ni se forman bucles es valida"):-
+    cadenaInspiracion(denken,[himmel, fern ,frieren , denken]).
 
 test("Una cadena de inspiracion en la que un personaje que aparece no inspiro al siguiente no es valida"):-
-    not(cadenaInspiracion(denken, [frieren, denken])).
+    not(cadenaInspiracion(denken, [denken,frieren])).
 
 test("Una cadena de inspiracion en la que un personaje se repite no es valida"):-
     not(cadenaInspiracion(frieren,[frieren,fern,frieren])).
