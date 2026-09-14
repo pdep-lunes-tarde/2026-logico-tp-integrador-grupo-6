@@ -220,58 +220,63 @@ estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
         )
     ).
 
+
+
+
 % Punto 5
 
 esHeroe(Persona):-
-    habitante(Persona, _, _, _),
-    conoce(_, hazania(_, Participantes, _), _, _),
-    member(Persona, Participantes).
+    habitante(Persona,_,_,_),
+    conoce(_,hazania(_,Participantes,_),_,_),
+    member(Persona,Participantes).
 
-inspiroHeroe(Heroe, Inspirador):-
+inspiroHeroe(Heroe,Inspirador):-
+    habitante(Heroe,_,_,_),
     esHeroe(Heroe),
-    conoce(Heroe, hazania(_, Participantes, _), _, _),
-    member(Inspirador, Participantes),
+    conoce(Heroe,hazania(_,Participantes,_),_,_),
+    member(Inspirador,Participantes),
     Inspirador \= Heroe.
 
 cadenaInspiracion(Heroe, Cadena):-
-    esHeroe(Heroe),
-    cadenaRecursiva(Heroe, [], Cadena),
-    last(Cadena, Heroe).
+    cadenaRecursiva(Heroe, [Heroe], Cadena).
 
-cadenaRecursiva(Heroe, Visitados, [Heroe]):-
-    not(member(Heroe, Visitados)).
+cadenaRecursiva(HeroeActual, Visitados, Cadena):-
+    inspiroHeroe(SiguienteHeroe, HeroeActual),
+    not(member(SiguienteHeroe, Visitados)),
+    cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena).
 
-cadenaRecursiva(Heroe, Visitados, Cadena):-
-    not(member(Heroe, Visitados)),
-    inspiroHeroe(Heroe, Inspirador),
-    cadenaRecursiva(Inspirador, [Heroe|Visitados], CadenaAnterior),
-    append(CadenaAnterior, [Heroe], Cadena).
-      
+cadenaRecursiva(_, Visitados, Cadena):-
+    length(Visitados, Cantidad),
+    Cantidad >= 2,
+    reverse(Visitados, Cadena).
+
+
 % Punto 6
 dreamTeam(Heroe, Equipo):-
-    esHeroe(Heroe),
-    cadenaInspiracion(Heroe, Cadena),
+    cadenaInspiracion(_, Cadena),
+    member(Heroe, Cadena),
+    antecesores(Heroe, Cadena, Antecesores),
+    subconjunto(Antecesores, AntecesoresEquipo),
+    member(_, AntecesoresEquipo),
+    permutation([Heroe|AntecesoresEquipo], Equipo).
 
-    generarEquipo(Cadena, [], Equipo),
-    member(Heroe, Equipo),
-    member(Otro, Equipo),
-    Heroe \= Otro.
+antecesores(Heroe, [Heroe|_], []).
 
+antecesores(Heroe, [Persona|Resto], [Persona|Antecesores]):-
+    Persona \= Heroe,
+    antecesores(Heroe, Resto, Antecesores).
 
-generarEquipo(_, Equipo, Equipo).
+    subconjunto([], []).
 
-generarEquipo(Cadena, Acumulador, EquipoFinal):-
+subconjunto([X|Xs], [X|Ys]) :-
+    subconjunto(Xs, Ys).
 
-    member(Integrante, Cadena),
-    not(member(Integrante, Acumulador)),
-
-    generarEquipo(Cadena, [Integrante | Acumulador], EquipoFinal).
-
-
-
-
+subconjunto([_|Xs], Ys) :-
+    subconjunto(Xs, Ys).
 
 :- begin_tests(tpIntegrador, []).
+
+
 
 % Tests punto 1
 test("Nadie esta vivo en un anio anterior a su nacimiento") :- 
@@ -403,7 +408,7 @@ test("Nadie inspira a un heroe del que no sabemos las hazanias que conoce"):-
     not(inspiroHeroe(eisen,_)).
 
 test("Una cadena de inspiracion a un heroe en la que cada heroe siguiente inspira al anterior, no se repiten ni se forman bucles es valida"):-
-    cadenaInspiracion(denken,[himmel, fern ,frieren , denken]).
+    cadenaInspiracion(himmel,[himmel, fern ,frieren , denken]).
 
 test("Una cadena de inspiracion en la que un personaje que aparece no inspiro al siguiente no es valida"):-
     not(cadenaInspiracion(denken, [denken,frieren])).
