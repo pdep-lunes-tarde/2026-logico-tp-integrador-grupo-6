@@ -136,6 +136,7 @@ seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado):-
 
 
 paginasLeidasEnPueblo(Pueblo, AnioDado, TotalPaginas):-
+    habitante(_, _, _, Pueblo),
     findall(Paginas,
             (habitante(Persona, _, _, Pueblo),
             conoce(Persona, hazania(_, _, _), AnioDado, leyo(Paginas))),
@@ -158,6 +159,7 @@ puebloMasLector(Pueblo, AnioDado):-
 
 
 esMusical(Pueblo, AnioDado):-
+    seRecuerdaEnPueblo(Pueblo, _, AnioDado),
     hazaniasRecordadas(Pueblo, AnioDado, Hazanias),
     hazaniasRecordadasPorCanciones(Pueblo, AnioDado, HazaniasPorCanciones),
     length(Hazanias, CantidadTotal),
@@ -166,6 +168,7 @@ esMusical(Pueblo, AnioDado):-
 
 
 hazaniasRecordadas(Pueblo, AnioDado, Hazanias):-
+    habitante(_, _, _, Pueblo),
     findall(
         NombreHazania,
         seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
@@ -175,6 +178,7 @@ hazaniasRecordadas(Pueblo, AnioDado, Hazanias):-
 
 
 hazaniasRecordadasPorCanciones(Pueblo, AnioDado, Hazanias):-
+    habitante(_, _, _, Pueblo),
     findall(
         NombreHazania,
         (
@@ -188,7 +192,7 @@ hazaniasRecordadasPorCanciones(Pueblo, AnioDado, Hazanias):-
 
 
 esChismoso(Pueblo, AnioDado):-
-    habitante(_, _, _, Pueblo),
+    seRecuerdaEnPueblo(Pueblo, _, AnioDado),
     not((
         seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         estaCorroborada(NombreHazania)
@@ -205,7 +209,7 @@ esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
 
 
 estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
-    habitante(_, _, _, Pueblo),
+    esImportanteParaPueblo(_, Pueblo, AnioDado),
     forall(
         (seRecuerdaEnPueblo(Pueblo, NombreHazania, AnioDado),
         esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado)),
@@ -220,14 +224,14 @@ estaViviendoTiemposSinPrecedentes(Pueblo, AnioDado):-
 % Punto 5
 
 esHeroe(Persona):-
-    habitante(Persona,_,_,_),
-    conoce(_,hazania(_,Participantes,_),_,_),
-    member(Persona,Participantes).
+    habitante(Persona, _, _, _),
+    conoce(_, hazania(_, Participantes, _), _, _),
+    member(Persona, Participantes).
 
-inspiroHeroe(Heroe,Inspirador):-
-    habitante(Heroe,_,_,_),
-    conoce(Heroe,hazania(_,Participantes,_),_,_),
-    member(Inspirador,Participantes),
+inspiroHeroe(Heroe, Inspirador):-
+    esHeroe(Heroe),
+    conoce(Heroe, hazania(_, Participantes, _), _, _),
+    member(Inspirador, Participantes),
     Inspirador \= Heroe.
 
 inspiraA(Inspirador, Inspirado):-
@@ -243,6 +247,12 @@ cadenaRecursiva(HeroeActual, Visitados, Cadena):-
         not(member(SiguienteHeroe, Visitados)), % Chequeamos 
         cadenaRecursiva(SiguienteHeroe, [SiguienteHeroe | Visitados], Cadena). % Utilizamos cadena para guardar el camino final de visitados
 
+cadenaRecursiva(Heroe, Visitados, Cadena):-
+    not(member(Heroe, Visitados)),
+    inspiroHeroe(Heroe, Inspirador),
+    cadenaRecursiva(Inspirador, [Heroe|Visitados], CadenaAnterior),
+    append(CadenaAnterior, [Heroe], Cadena).
+      
 % Punto 6
 
 subconjunto([], []).
