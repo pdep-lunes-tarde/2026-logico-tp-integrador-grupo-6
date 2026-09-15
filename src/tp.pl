@@ -199,6 +199,7 @@ esChismoso(Pueblo, AnioDado):-
 
 
 esImportanteParaPueblo(NombreHazania, Pueblo, AnioDado):-
+    conoce(_,hazania(NombreHazania,_,_),_,_),
     habitante(_, _, _, Pueblo),
     forall(
         (habitante(Persona, _, _, Pueblo),
